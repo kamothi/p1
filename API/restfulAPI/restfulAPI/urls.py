@@ -11,4 +11,10 @@ urlpatterns = [
     path('sign/',views.signup),
     path('check/',views.check_login),
     path('board/', views.board_list),
+    path('challenge/', views.challenge_list),
+    path('home/', views.challenge_home),
+    path('home/smallcategory/', views.challenge_smallcategory),
+    path('home/smallcategory/content/<int:pk>/', views.challenge_content),
+    path('rank/', views.challenge_rank),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
