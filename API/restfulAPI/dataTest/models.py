@@ -31,3 +31,16 @@ class board(models.Model):
 class Like(models.Model):
     user = models.ForeignKey('Customer', on_delete=models.CASCADE)
     post = models.ForeignKey('board', on_delete=models.CASCADE)
+    
+class challenge(models.Model):
+    challenge_id = models.AutoField(primary_key=True) #챌린지 아이디
+    subject = models.CharField(max_length=200) # 챌린지 이름
+    content = models.TextField() # 챌린지에 대한 내용
+    address = models.URLField() # URL 주소
+    update_date = models.DateTimeField(auto_now_add=True) # 생성 날짜
+    views = models.PositiveIntegerField(default=0) # 조회수
+    rate = models.IntegerField() # 평점
+    Bigcategory = models.CharField(max_length=100) # 큰카테고리
+    smallcategory = models.CharField(max_length=100, default = '') # 작은 카테고리
+   #comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+   #user_id
