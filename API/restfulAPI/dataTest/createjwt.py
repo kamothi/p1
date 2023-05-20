@@ -8,4 +8,4 @@ def generate_jwt_token(user_id):
         'exp': datetime.utcnow() + timedelta(days=1),
         'iat': datetime.utcnow()
     }
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256').decode('utf-8')
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')

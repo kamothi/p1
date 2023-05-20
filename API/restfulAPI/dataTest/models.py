@@ -22,8 +22,8 @@ class board(models.Model):
     title = models.CharField(max_length=50, null=True)  # 제목
     content = models.TextField(null=True)  # 게시글 내용
     update_date = models.DateTimeField(auto_now_add=True, null=True)  # 게시글 올린 시간
-    views = models.PositiveIntegerField()  # 조회수
-    comment = models.PositiveIntegerField()  # 댓글 수
+    views = models.PositiveIntegerField(max_length=50, null=True)  # 조회수
+    comment = models.PositiveIntegerField(max_length=50, null=True)  # 댓글 수
     # comment_id 댓글 id
     userId = models.ForeignKey('Customer', on_delete=models.CASCADE, db_column="userId", null=True)
     liked_users = models.ManyToManyField('Customer', through='Like', related_name='liked_posts')

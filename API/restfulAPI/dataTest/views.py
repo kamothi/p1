@@ -46,10 +46,7 @@ def login(request):
                 hashed_password = serializer.data[0]['password']
                 if bcrypt.checkpw(data['password'].encode('utf-8'), hashed_password.encode('utf-8')):
                     token = generate_jwt_token(serializer.data[0]['id'])
-                    response = HttpResponse("Login successful")
-                    response.status_code = 200
-                    response['token'] = token
-                    return response
+                    return JsonResponse({'message': 'SUCCESS', 'access_token': token.decode('utf-8')}, status=200)
                 else:
                     return JsonResponse(data, status=400, json_dumps_params={'ensure_ascii': False})
         except:
@@ -87,25 +84,26 @@ def check_login(request):
         decoded = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         id = decoded.get('user_id')
         cus = list(Customer.objects.filter(id=id).values())
-        return JsonResponse(cus[0]['nickname'], safe=False, json_dumps_params={'ensure_ascii': False})
+        return JsonResponse(cus[0],safe=False, json_dumps_params={'ensure_ascii': False})
 
 @csrf_exempt
 def board_list(request):
-    if request.method == 'GET': # GET 방식일 때
-        query_set = board.objects.all() # ORM으로 board의 모든 객체 받아옴
-        serializer = boardSerializer(query_set, many=True) # JSON으로 변환
-        return JsonResponse(serializer.data, safe=False) # JSON타입의 데이터로 응답
+    if request.method == 'GET':  # GET 방식일 때
+        query_set = board.objects.all()  # ORM으로 board의 모든 객체 받아옴
+        serializer = boardSerializer(query_set, many=True)  # JSON으로 변환
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={'ensure_ascii': False})  # JSON타입의 데이터로 응답
 
-    elif request.method == 'POST': # POST방식일 때
-        data = JSONParser().parse(request) # 요청들어온 데이터를 JSON 타입으로 파싱
-        serializer = writeSerializer(data=data) # Serializer를 사용해 전송받은 데이터를 변환하기 위함
+    elif request.method == 'POST':  # POST방식일 때
+        data = JSONParser().parse(request)  # 요청들어온 데이터를 JSON 타입으로 파싱
+        serializer = writeSerializer(data=data)  # Serializer를 사용해 전송받은 데이터를 변환하기 위함
 
-        if serializer.is_valid(): # 생성한 모델과 일치하면
-            serializer.save() # 데이터 저장
+        if serializer.is_valid():  # 생성한 모델과 일치하면
+            serializer.save()  # 데이터 저장
+            return JsonResponse(data, status=201, json_dumps_params={'ensure_ascii': False})  # 정상 응답 201
         # Board = board(title=data['title'], content=data['content'], user_id=data['userId'])
         # Board.save()
-        return JsonResponse(data, status=201) # 정상 응답 201
-        # return JsonResponse(serializer.errors, status=400) # 모델에 일치하지 않는 데이터일 경우
+
+        return JsonResponse(serializer.errors, status=400)  # 모델에 일치하지 않는 데이터일 경우
         
 
 def challenge_list(request):

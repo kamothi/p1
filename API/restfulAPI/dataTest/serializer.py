@@ -23,7 +23,7 @@ class boardSerializer(serializers.ModelSerializer):
 class writeSerializer(serializers.ModelSerializer):
     class Meta:
         model = board
-        fields = ["title", "content", "userId"]
+        fields = ["title", "content", "views","comment","userId"]
  
 class challengeSerializer(serializers.ModelSerializer):
     class Meta:
