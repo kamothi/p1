@@ -42,5 +42,10 @@ class challenge(models.Model):
     rate = models.IntegerField() # 평점
     Bigcategory = models.CharField(max_length=100) # 큰카테고리
     smallcategory = models.CharField(max_length=100, default = '') # 작은 카테고리
-   #comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    liked_users = models.ManyToManyField('Customer', through='Like2', related_name='liked_challenges')
+
+#comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
    #user_id
+class Like2(models.Model):
+    user = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    challenge = models.ForeignKey('challenge', on_delete=models.CASCADE)

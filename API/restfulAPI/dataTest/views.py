@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 from .createjwt import generate_jwt_token
 import jwt
 from django.conf import settings
-from .models import challenge
+from .models import challenge, Like, Like2
 from .serializer import userSerializer
 from .serializer import challengeSerializer
 from .serializer import mainchallengeSerializer
@@ -17,7 +18,7 @@ from .serializer import smallchallengeSerializer
 from .serializer import contentchallengeSerializer
 from .serializer import updatechallengeSerializer
 from .serializer import rankchallengeSerializer
-
+from django.db.models import Count
 @csrf_exempt
 def user_list(request):
     if request.method == 'GET': # GET 방식일 때
@@ -127,24 +128,56 @@ def challenge_home(request):
         return JsonResponse(serializer.data, safe=False)  # JSON타입의 데이터로 응답
 
 def challenge_smallcategory(request):
-    if request.method == 'GET':  # GET 방식일 때
-        query_set = challenge.objects.all()  # ORM으로 Users의 모든 객체 받아옴
-        serializer = smallchallengeSerializer(query_set, many=True)  # JSON으로 변환
-        return JsonResponse(serializer.data, safe=False)  # JSON타입의 데이터로 응답
+    if request.method == 'GET':
+        challenge_ids = challenge.objects.values_list('challenge_id', flat=True)
 
-def challenge_content(request,pk):
+        if not challenge_ids:
+            return JsonResponse({'error': 'Challenge IDs are missing'}, status=400)
+
+        try:
+            targets = challenge.objects.filter(challenge_id__in=challenge_ids)
+        except challenge.DoesNotExist:
+            return JsonResponse({'error': 'Challenge does not exist'}, status=404)
+
+        like_counts = targets.annotate(like_count=Count('liked_users')).values('challenge_id', 'like_count')
+        # like_count = target.liked_users.aggregate(count=Count('id'))['count']
+        serializer = smallchallengeSerializer(targets, many=True)
+        data = [{'challenge_id': item['challenge_id'], 'like_count': item['like_count']} for item in like_counts]
+        return JsonResponse({'data': serializer.data, 'like_count': data}, safe=False)
+
+def challenge_content(request, pk):
     object = challenge.objects.get(pk=pk)
     if request.method == "GET":
         serializer = contentchallengeSerializer(object)
         return JsonResponse(serializer.data, safe=False)
 
-    elif request.method == 'PUT': # POST방식일 때
-        update_data = JSONParser().parse(request) # 요청들어온 데이터를 JSON 타입으로 파싱
-        serializer = updatechallengeSerializer(data=update_data) # Serializer를 사용해 전송받은 데이터를 변환하기 위함
-        if serializer.is_valid(): # 생성한 모델과 일치하면
-            serializer.save() # 데이터 저장
-            return JsonResponse(serializer.data, status=201) # 정상 응답 201
-        return JsonResponse(serializer.errors, status=400) # 모델에 일치하지 않는 데이터일 경우
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        user = request.Customer
+        challenge_id = data.get('challenge_id', None)
+        if not challenge_id:
+            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
+
+            # valid post check
+        if not challenge.objects.filter(challenge_id=challenge_id).exists():
+            return JsonResponse({'message': 'INVALID_POST'}, status=400)
+
+        target = challenge.objects.get(challenge_id=challenge_id)
+
+        if target.liked_users.filter(id=user.id).exists():
+            target.liked_users.remove(user)
+            update_data = JSONParser().parse(request)
+            serializer = updatechallengeSerializer(data=update_data)
+            message = 'Cancle'
+            return JsonResponse({'message': message, 'data' : serializer.data }, status=201)
+        else:
+            target.liked_users.add(user)
+            update_data = JSONParser().parse(request)
+            serializer = updatechallengeSerializer(data=update_data)
+            message = 'Like'
+            return JsonResponse({'message': message, 'data': serializer.data}, status=201)
+
+        return JsonResponse(serializer.errors, status=400)
 
 def challenge_rank(request):
     if request.method == 'GET':  # GET 방식일 때

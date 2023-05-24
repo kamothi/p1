@@ -33,22 +33,22 @@ class challengeSerializer(serializers.ModelSerializer):
 class mainchallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
-        fields = ["subject", "Bigcategory", "smallcategory"]
+        fields = ["subject", "Bigcategory", "smallcategory", "challenge_id"]
 
 class smallchallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
-        fields = ["subject", "like", "dislike", "rate", "views"]
+        fields = ["subject", "rate", "views"]
 
 class contentchallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
-        fields = ["subject", "content", "address","challenge_id","views"]
+        fields = ["subject", "content", "address", "challenge_id", "views"]
 
 class updatechallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
-        fields = ["rate", "like", "dislike","views"]
+        fields = ["rate", "views"]
 
 class rankchallengeSerializer(serializers.ModelSerializer):
     class Meta:
