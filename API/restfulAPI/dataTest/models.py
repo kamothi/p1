@@ -49,3 +49,13 @@ class challenge(models.Model):
 class ch_Like(models.Model):
     user = models.ForeignKey('Customer', on_delete=models.CASCADE)
     challenge = models.ForeignKey('challenge', on_delete=models.CASCADE)
+
+class Comment(models.Model):
+    board = models.ForeignKey('board', on_delete=models.CASCADE,related_name='comments')
+    user = models.ForeignKey('Customer', on_delete=models.CASCADE,related_name='comments')
+    content = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # def __str__(self):
+    #     return self.content
+    # 위에 주석 처리한 부분은 리턴시에 객체 자체를 반환하겠다는 의미이다.

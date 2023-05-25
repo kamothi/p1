@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from .createjwt import generate_jwt_token
 import jwt
 from django.conf import settings
-from .models import challenge, Like, ch_Like
-from .serializer import userSerializer
+from .models import challenge, Like, ch_Like,Comment
+from .serializer import userSerializer, updateCommentSerializer
 from .serializer import challengeSerializer
 from .serializer import mainchallengeSerializer
 from .serializer import smallchallengeSerializer
@@ -184,3 +184,19 @@ def challenge_rank(request):
         query_set = challenge.objects.all()  # ORM으로 Users의 모든 객체 받아옴
         serializer = rankchallengeSerializer(query_set, many=True)  # JSON으로 변환
         return JsonResponse(serializer.data, safe=False)  # JSON타입의 데이터로 응답
+
+def post_comment(request):
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = updateCommentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(data, status=201, json_dumps_params={'ensure_ascii': False})
+        return JsonResponse(serializer.errors, status=400)
+
+def show_comment(request):
+    if request.method == "GET":
+        data = JSONParser().parse(request)
+        list = Comment.objects.filter(board = data['id']).only("content","user")
+        return JsonResponse(list, status=201, json_dumps_params={'ensure_ascii': False})
+

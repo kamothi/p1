@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Users,Customer
 from .models import board
-from .models import challenge
+from .models import challenge, Comment
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,3 +54,8 @@ class rankchallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
         fields = ["subject", "like"]
+
+class updateCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["board","user","content"]
