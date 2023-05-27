@@ -11,7 +11,7 @@ from .createjwt import generate_jwt_token
 import jwt
 from django.conf import settings
 from .models import challenge, Like, ch_Like,Comment
-from .serializer import userSerializer, updateCommentSerializer
+from .serializer import userSerializer, updateCommentSerializer,showCommentSerializer
 from .serializer import challengeSerializer
 from .serializer import mainchallengeSerializer
 from .serializer import smallchallengeSerializer
@@ -197,6 +197,7 @@ def post_comment(request):
 def show_comment(request):
     if request.method == "GET":
         data = JSONParser().parse(request)
-        list = Comment.objects.filter(board = data['id']).only("content","user")
-        return JsonResponse(list, status=201, json_dumps_params={'ensure_ascii': False})
+        list = Comment.objects.filter(board=data['id']).only("content","user")
+        serializer = showCommentSerializer(list, many=True)
+        return JsonResponse(serializer.data, status=201, json_dumps_params={'ensure_ascii': False},safe=False)
 

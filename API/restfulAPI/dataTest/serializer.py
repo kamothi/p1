@@ -59,3 +59,8 @@ class updateCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ["board","user","content"]
+
+class showCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["user","content"]
