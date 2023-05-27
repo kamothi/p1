@@ -38,7 +38,7 @@ class mainchallengeSerializer(serializers.ModelSerializer):
 class smallchallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
-        fields = ["subject", "rate", "views"]
+        fields = ["challenge_id", "subject", "rate", "views", "smallcategory"]
 
 class contentchallengeSerializer(serializers.ModelSerializer):
     class Meta:
