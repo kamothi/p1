@@ -16,5 +16,9 @@ urlpatterns = [
     path('home/smallcategory/', views.challenge_smallcategory),
     path('home/smallcategory/content/<int:pk>/', views.challenge_content),
     path('rank/', views.challenge_rank),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('comment/', views.show_comment),
+    path('comment/post/', views.post_comment)
+
+
 ]
