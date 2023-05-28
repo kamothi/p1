@@ -17,7 +17,7 @@ class signSerializer(serializers.ModelSerializer):
 class boardSerializer(serializers.ModelSerializer):
     class Meta:
         model = board
-        fields = ["title", "content", "comment", "update_date"]
+        fields = ["title", "content", "comment", "update_date","board_id"]
 # 제목/ 게시글 내용/ 댓글 수/ 좋아요 수/ 게시글 올린 시간  // 익명은 프론트에서
 
 class writeSerializer(serializers.ModelSerializer):
