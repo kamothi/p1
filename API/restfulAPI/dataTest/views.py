@@ -176,7 +176,7 @@ def challenge_content(request, pk):
         total_rate = rates.aggregate(total=Sum('rate'))['total']
         rate_count = rates.count()
 
-        average_rate = total_rate / rate_count
+        average_rate = int(total_rate / rate_count)
 
         update_data = {
             'rate': average_rate
