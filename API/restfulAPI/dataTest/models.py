@@ -59,3 +59,7 @@ class Comment(models.Model):
     # def __str__(self):
     #     return self.content
     # 위에 주석 처리한 부분은 리턴시에 객체 자체를 반환하겠다는 의미이다.
+class ch_rate(models.Model):
+    user = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    challenge = models.ForeignKey('challenge', on_delete=models.CASCADE)
+    rate = models.IntegerField(null=True)

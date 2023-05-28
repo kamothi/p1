@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from .createjwt import generate_jwt_token
 import jwt
 from django.conf import settings
-from .models import challenge, Like, ch_Like,Comment
+from .models import challenge, Like, ch_Like,Comment, ch_rate
 from .serializer import userSerializer, updateCommentSerializer,showCommentSerializer
 from .serializer import challengeSerializer
 from .serializer import mainchallengeSerializer
@@ -18,7 +18,7 @@ from .serializer import smallchallengeSerializer
 from .serializer import contentchallengeSerializer
 from .serializer import updatechallengeSerializer
 from .serializer import rankchallengeSerializer
-from django.db.models import Count
+from django.db.models import Count, Avg, Sum
 @csrf_exempt
 def user_list(request):
     if request.method == 'GET': # GET 방식일 때
@@ -158,9 +158,7 @@ def challenge_content(request, pk):
         data = json.loads(request.body)
         nickname = data.get("nickname")
         challenge_id = pk
-        update_data = {
-            'rate': data.get('rate')
-        }
+        rate = data.get("rate")
         if not challenge_id:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
 
@@ -170,7 +168,19 @@ def challenge_content(request, pk):
 
         target = challenge.objects.get(challenge_id=challenge_id)
         check_cust = Customer.objects.get(nickname=nickname)
+        ch_rate_instance, created = ch_rate.objects.get_or_create(user=check_cust, challenge=target)
+        ch_rate_instance.rate = rate
+        ch_rate_instance.save()
 
+        rates = ch_rate.objects.filter(challenge_id=challenge_id)
+        total_rate = rates.aggregate(total=Sum('rate'))['total']
+        rate_count = rates.count()
+
+        average_rate = total_rate / rate_count
+
+        update_data = {
+            'rate': average_rate
+        }
         if target.liked_users.filter(id=check_cust.id).exists():
             serializer = updatechallengeSerializer(target, data=update_data)
             if serializer.is_valid():
