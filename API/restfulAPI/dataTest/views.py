@@ -47,7 +47,7 @@ def login(request):
                 hashed_password = serializer.data[0]['password']
                 if bcrypt.checkpw(data['password'].encode('utf-8'), hashed_password.encode('utf-8')):
                     token = generate_jwt_token(serializer.data[0]['id'])
-                    return JsonResponse({'message': 'SUCCESS', 'access_token': token.decode('utf-8')}, status=200)
+                    return JsonResponse({'message': 'SUCCESS', 'access_token': token.decode('utf-8'),'age': serializer.data[0]['age']}, status=200)
                 else:
                     return JsonResponse(data, status=400, json_dumps_params={'ensure_ascii': False})
         except:
@@ -86,6 +86,7 @@ def check_login(request):
         id = decoded.get('user_id')
         cus = list(Customer.objects.filter(id=id).values())
         return JsonResponse(cus[0],safe=False, json_dumps_params={'ensure_ascii': False})
+
 
 @csrf_exempt
 def board_list(request):
