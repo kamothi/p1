@@ -48,7 +48,7 @@ class contentchallengeSerializer(serializers.ModelSerializer):
 class updatechallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = challenge
-        fields = ["rate", "views"]
+        fields = ["rate"]
 
 class rankchallengeSerializer(serializers.ModelSerializer):
     class Meta:

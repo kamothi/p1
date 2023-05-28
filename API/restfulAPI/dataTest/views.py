@@ -149,13 +149,18 @@ def challenge_smallcategory(request):
 def challenge_content(request, pk):
     object = challenge.objects.get(pk=pk)
     if request.method == "GET":
+        object.views += 1
+        object.save()
         serializer = contentchallengeSerializer(object)
         return JsonResponse(serializer.data, safe=False)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
-        user = request.Customer
-        challenge_id = data.get('challenge_id', None)
+        nickname = data.get("nickname")
+        challenge_id = pk
+        update_data = {
+            'rate': data.get('rate')
+        }
         if not challenge_id:
             return JsonResponse({'message': 'KEY_ERROR'}, status=400)
 
@@ -164,19 +169,24 @@ def challenge_content(request, pk):
             return JsonResponse({'message': 'INVALID_POST'}, status=400)
 
         target = challenge.objects.get(challenge_id=challenge_id)
+        check_cust = Customer.objects.get(nickname=nickname)
 
-        if target.liked_users.filter(id=user.id).exists():
-            target.liked_users.remove(user)
-            update_data = JSONParser().parse(request)
-            serializer = updatechallengeSerializer(data=update_data)
-            message = 'Cancle'
-            return JsonResponse({'message': message, 'data' : serializer.data }, status=201)
+        if target.liked_users.filter(id=check_cust.id).exists():
+            serializer = updatechallengeSerializer(target, data=update_data)
+            if serializer.is_valid():
+                serializer.save()
+                target.liked_users.remove(check_cust)
+                #update_data = JSONParser().parse(request)
+                message = 'Cancle'
+                return JsonResponse({'message': message, 'data' : serializer.data }, status=201)
         else:
-            target.liked_users.add(user)
-            update_data = JSONParser().parse(request)
-            serializer = updatechallengeSerializer(data=update_data)
-            message = 'Like'
-            return JsonResponse({'message': message, 'data': serializer.data}, status=201)
+            serializer = updatechallengeSerializer(target, data=update_data)
+            if serializer.is_valid():
+                serializer.save()
+                target.liked_users.add(check_cust)
+                #update_data = JSONParser().parse(request)
+                message = 'Like'
+                return JsonResponse({'message': message, 'data': serializer.data}, status=201)
 
         return JsonResponse(serializer.errors, status=400)
 
