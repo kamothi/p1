@@ -216,7 +216,7 @@ def post_comment(request):
         return JsonResponse(serializer.errors, status=400)
 
 def show_comment(request):
-    if request.method == "GET":
+    if request.method == "POST":
         data = JSONParser().parse(request)
         list = Comment.objects.filter(board=data['id']).only("content","user")
         serializer = showCommentSerializer(list, many=True)
