@@ -143,8 +143,14 @@ def challenge_smallcategory(request):
         like_counts = targets.annotate(like_count=Count('liked_users')).values('challenge_id', 'like_count')
         # like_count = target.liked_users.aggregate(count=Count('id'))['count']
         serializer = smallchallengeSerializer(targets, many=True)
-        data = [{'challenge_id': item['challenge_id'], 'like_count': item['like_count']} for item in like_counts]
-        return JsonResponse({'data': serializer.data, 'like_count': data}, safe=False)
+        #data = [{'like_count': item['like_count']} for item in like_counts]
+        data = []
+        for item in serializer.data:
+            like_count = next(
+                (count['like_count'] for count in like_counts if count['challenge_id'] == item['challenge_id']), 0)
+            item['like_count'] = like_count
+            data.append(item)
+        return JsonResponse({'data': data}, safe=False)
 
 def challenge_content(request, pk):
     object = challenge.objects.get(pk=pk)
