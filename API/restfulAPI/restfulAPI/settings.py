@@ -29,7 +29,7 @@ SECRET_KEY = 'secret'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['3.37.96.143', '127.0.0.1']
+ALLOWED_HOSTS = ['aws-주소', '127.0.0.1']
 
 
 # Application definition
